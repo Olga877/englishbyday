@@ -3,14 +3,13 @@
 (function() {
     const form = document.getElementById('leadForm');
 
-    // ===== НАСТРОЙКИ (только Telegram) =====
-    const TELEGRAM_BOT_TOKEN = '8662203342:AAHzwrqSmUwBCFX1Fpt2--CzhNHDoIaLmTc';
-    const TELEGRAM_CHAT_ID = '5182226694';
+    // ===== НАСТРОЙКИ =====
+    const FORMSPREE_URL = 'https://formspree.io/f/mnpaerog'; // замените на ваш URL
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();
 
-        // 1. Собираем данные
+        // Собираем данные
         const data = {
             child_name: document.getElementById('child_name').value.trim(),
             grade: document.getElementById('grade').value,
@@ -21,7 +20,7 @@
             source: 'englishbyday.ru'
         };
 
-        // 2. Валидация
+        // Валидация
         if (!data.child_name || !data.parent_email || !data.phone) {
             alert('Пожалуйста, заполните все обязательные поля.');
             return;
@@ -31,38 +30,23 @@
             return;
         }
 
-        // 3. Отправка в Telegram
-        const message = `
-📩 Новая заявка!
-👶 Имя: ${data.child_name}
-📚 Класс: ${data.grade}
-📧 Email: ${data.parent_email}
-📱 Телефон: ${data.phone}
-🕐 Время: ${data.time}
-🌐 Источник: ${data.source}
-`;
-
-        fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        // Отправка через Formspree
+        fetch(FORMSPREE_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: TELEGRAM_CHAT_ID,
-                text: message,
-                parse_mode: 'HTML'
-            })
+            body: JSON.stringify(data)
         })
         .then(response => {
             if (response.ok) {
                 alert('✅ Спасибо! Ваша заявка принята. Мы свяжемся с вами в ближайшее время.');
                 form.reset();
-                // Уменьшаем счётчик мест
                 const spotsEl = document.getElementById('spotsCount');
                 let current = parseInt(spotsEl.textContent, 10);
                 if (current > 0) {
                     spotsEl.textContent = current - 1;
                 }
             } else {
-                alert('❌ Произошла ошибка при отправке. Попробуйте ещё раз или свяжитесь с нами напрямую.');
+                alert('❌ Произошла ошибка. Попробуйте ещё раз.');
             }
         })
         .catch(error => {
