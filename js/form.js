@@ -3,6 +3,12 @@
 (function() {
     const form = document.getElementById('leadForm');
 
+    // ===== НАСТРОЙКИ (замените на свои) =====
+    const TELEGRAM_BOT_TOKEN = '8662203342:AAHzwrqSmUwBCFX1Fpt2--CzhNHDoIaLmTc';   // получите у @BotFather
+    const TELEGRAM_CHAT_ID = '5182226694';       // получите у @userinfobot
+    // Если не используете Google Sheets, оставьте пустую строку
+    const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyNeyGnQ6m87reUHgPMAA-uxtS6cyZ_5IDn5_n1TIuw0iTRpvj6iTo7oaxGMIRHTNVRvQ/exec'; // от Apps Script
+
     form.addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -14,7 +20,7 @@
             phone: document.getElementById('phone').value.trim(),
             time: document.getElementById('time').value,
             consent: document.getElementById('consent').checked,
-            source: 'dailyenglish.ru'
+            source: 'englishbyday.ru'
         };
 
         // 2. Валидация
@@ -27,19 +33,63 @@
             return;
         }
 
-        // 3. Здесь будет реальная отправка (Telegram + Google Sheets)
-        // Сейчас — демо-заглушка
-        console.log('📩 Заявка:', data);
-        alert('✅ Спасибо! Ваша заявка принята. Мы свяжемся с вами в ближайшее время.');
-        form.reset();
+        // 3. Отправка в Telegram
+        const sendToTelegram = () => {
+            const message = `
+📩 Новая заявка!
+👶 Имя: ${data.child_name}
+📚 Класс: ${data.grade}
+📧 Email: ${data.parent_email}
+📱 Телефон: ${data.phone}
+🕐 Время: ${data.time}
+🌐 Источник: ${data.source}
+`;
+            return fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: TELEGRAM_CHAT_ID,
+                    text: message,
+                    parse_mode: 'HTML'
+                })
+            });
+        };
 
-        // 4. Уменьшаем счётчик мест (для демонстрации)
-        const spotsEl = document.getElementById('spotsCount');
-        let current = parseInt(spotsEl.textContent, 10);
-        if (current > 0) {
-            spotsEl.textContent = current - 1;
-        }
+        // 4. Отправка в Google Sheets (если URL указан)
+        const sendToSheets = () => {
+            if (!GOOGLE_SHEETS_URL || GOOGLE_SHEETS_URL === 'URL_ВАШЕГО_ВЕБ-ПРИЛОЖЕНИЯ') {
+                return Promise.resolve(); // пропускаем, если не настроено
+            }
+            return fetch(GOOGLE_SHEETS_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+        };
+
+        // 5. Выполняем обе отправки параллельно
+        Promise.all([sendToTelegram(), sendToSheets()])
+            .then(responses => {
+                // Проверяем, что все ответы успешны
+                const allOk = responses.every(res => res && res.ok);
+                if (allOk) {
+                    alert('✅ Спасибо! Ваша заявка принята. Мы свяжемся с вами в ближайшее время.');
+                    form.reset();
+                    // Уменьшаем счётчик мест
+                    const spotsEl = document.getElementById('spotsCount');
+                    let current = parseInt(spotsEl.textContent, 10);
+                    if (current > 0) {
+                        spotsEl.textContent = current - 1;
+                    }
+                } else {
+                    alert('❌ Произошла ошибка при отправке. Попробуйте ещё раз или свяжитесь с нами напрямую.');
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert('❌ Ошибка соединения. Проверьте интернет и попробуйте снова.');
+            });
     });
 
-    console.log('✅ Лендинг dailyenglish.ru загружен');
+    console.log('✅ Лендинг englishbyday.ru загружен');
 })();
