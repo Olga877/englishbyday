@@ -7,7 +7,7 @@
     const TELEGRAM_BOT_TOKEN = '8662203342:AAHzwrqSmUwBCFX1Fpt2--CzhNHDoIaLmTc';   // получите у @BotFather
     const TELEGRAM_CHAT_ID = '5182226694';       // получите у @userinfobot
     // Если не используете Google Sheets, оставьте пустую строку
-    const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbx_zNCGDWEYZkKR-oglKVybp87gNegHleD7eSmQNCB7XsfObEIKu9_X1gAnFPtRV8bi8w/exec'; // от Apps Script
+//    const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbx_zNCGDWEYZkKR-oglKVybp87gNegHleD7eSmQNCB7XsfObEIKu9_X1gAnFPtRV8bi8w/exec'; // от Apps Script
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();
