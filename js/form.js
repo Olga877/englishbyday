@@ -4,7 +4,7 @@
     const form = document.getElementById('leadForm');
 
     // ===== НАСТРОЙКИ =====
-    const FORMSPREE_URL = 'https://formspree.io/f/mnpaerog'; // замените на ваш URL
+    const FORMSPREE_URL = 'https://formspree.io/f/mnpaerog';
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -40,11 +40,7 @@
             if (response.ok) {
                 alert('✅ Спасибо! Ваша заявка принята. Мы свяжемся с вами в ближайшее время.');
                 form.reset();
-                const spotsEl = document.getElementById('spotsCount');
-                let current = parseInt(spotsEl.textContent, 10);
-                if (current > 0) {
-                    spotsEl.textContent = current - 1;
-                }
+                // Счётчик НЕ уменьшается — вы обновляете его вручную в index.html
             } else {
                 alert('❌ Произошла ошибка. Попробуйте ещё раз.');
             }
