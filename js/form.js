@@ -17,6 +17,7 @@
             phone: document.getElementById('phone').value.trim(),
             time: document.getElementById('time').value,
             consent: document.getElementById('consent').checked,
+            comment: document.getElementById('comment').value.trim(),
             source: 'englishbyday.ru'
         };
 
